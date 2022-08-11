@@ -73,10 +73,10 @@ class CirclePay_API{
 	{
 		$data =  WC()->payment_gateways->get_available_payment_gateways()[ CIRCLEPAY_SLUG ]->settings;
 
-		self::$account_key 		= sanitize_key( $data['account_key'] );
-		self::$account_token 	= sanitize_key( $data['account_token'] );
-		self::$merchant_token 	= sanitize_key( $data['merchant_token'] );
-		self::$sandbox 			= sanitize_key( $data['sandbox'] ) !== 'yes' ? false :  true ;
+		self::$account_key 		= sanitize_text_field( $data['account_key'] );
+		self::$account_token 	= sanitize_text_field( $data['account_token'] );
+		self::$merchant_token 	= sanitize_text_field( $data['merchant_token'] );
+		self::$sandbox 			= sanitize_text_field( $data['sandbox'] ) !== 'yes' ? false :  true ;
 	}
 
 	/**
@@ -134,4 +134,8 @@ class CirclePay_API{
 		return self::create_connection( $base, 'GET');
 	}
 
+	public static function enabled_payment_methods(){
+		$base = self::get_endpoint_base( 'merchants/payment/method/list' );
+		return self::create_connection( $base, 'GET');
+	}
 }
