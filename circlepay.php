@@ -27,7 +27,7 @@ if ( !in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', 
 define( 'CIRCLEPAY_NAME', 'CirclePay' );
 
 // Plugin slug
-define( 'CIRCLEPAY_SLUG', 'circlePay' );
+define( 'CIRCLEPAY_SLUG', 'circlepay' );
 
 // Plugin version
 define( 'CIRCLEPAY_VERSION', '1.0.0' );

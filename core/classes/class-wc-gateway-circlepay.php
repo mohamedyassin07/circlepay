@@ -34,11 +34,10 @@ class WC_Gateway_CirclePay extends WC_Payment_Gateway {
 		$this->add_hooks();
 	}
 
-
 	public function set_generel_settings()
 	{
-		$this->id = 'circlepay';
-		$this->has_fields =  false ;
+		$this->id = CIRCLEPAY_SLUG;
+		$this->has_fields = false ;
 		$this->method_title = __( 'CirclePay', 'circlepay' );
 		$this->method_description = __( 'CirclePay Settings', 'circlepay' );
 		$this->supports = array(
