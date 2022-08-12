@@ -85,7 +85,7 @@ if ( ! class_exists( 'Circlepay' ) ) :
 				self::$instance->settings		= new Circlepay_Settings();
 
 				//Fire the plugin logic
-				new Circlepay_Run();
+				new Circlepay_Run;
 
 				/**
 				 * Fire a custom action to allow dependencies

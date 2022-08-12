@@ -71,12 +71,11 @@ class CirclePay_API{
 
 	private static function set_authentication_info()
 	{
-		$data =  WC()->payment_gateways->get_available_payment_gateways()[ CIRCLEPAY_SLUG ]->settings;
-
-		self::$account_key 		= sanitize_text_field( $data['account_key'] );
-		self::$account_token 	= sanitize_text_field( $data['account_token'] );
-		self::$merchant_token 	= sanitize_text_field( $data['merchant_token'] );
-		self::$sandbox 			= sanitize_text_field( $data['sandbox'] ) !== 'yes' ? false :  true ;
+		$circlepay_data 		= get_option( 'woocommerce_circlepay_settings');
+		self::$account_key 		= sanitize_text_field( $circlepay_data['account_key'] );
+		self::$account_token 	= sanitize_text_field( $circlepay_data['account_token'] );
+		self::$merchant_token 	= sanitize_text_field( $circlepay_data['merchant_token'] );
+		self::$sandbox 			= sanitize_text_field( $circlepay_data['sandbox'] ) !== 'yes' ? false :  true ;
 	}
 
 	/**

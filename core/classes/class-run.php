@@ -43,8 +43,7 @@ class Circlepay_Run{
 	private function add_hooks(){
 		add_action( 'plugin_action_links_' . CIRCLEPAY_PLUGIN_BASE, array( $this, 'add_plugin_action_link' ), 20 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_backend_scripts_and_styles' ), 20 );
-		add_filter( 'woocommerce_payment_gateways', array( $this,'add_circlepay_method_to_wc' ) );
-		add_action( 'plugins_loaded', array( $this, 'include_circlepay_class' ) );
+		add_action( 'plugins_loaded', array( $this, 'includes' ) );
 	}
 
 	/**
@@ -56,14 +55,10 @@ class Circlepay_Run{
 	 */
 
 
-	public function include_circlepay_class()
+	public function includes()
 	{
-		require_once CIRCLEPAY_PLUGIN_DIR . 'core/classes/class-wc-gateway-circlepay.php';
-	}
-
-	public function add_circlepay_method_to_wc( $gateways ) {
-		$gateways[] = 'WC_Gateway_CirclePay'; 
-		return $gateways;
+		require_once CIRCLEPAY_PLUGIN_DIR . 'core/classes/class-available-methods.php';
+		new CirclePay_Available_Methods;
 	}
 
 

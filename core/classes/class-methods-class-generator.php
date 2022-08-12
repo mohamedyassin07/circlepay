@@ -14,12 +14,12 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class Methods_Class_Generator{
 
 	/**
-	 * The API Enviroment Status
+	 * Available CirclePay methods
 	 *
 	 * @var		string
 	 * @since   1.0.0
 	 */
-	protected $sandbox;
+	protected $available_methods = [];
 
 
 	public function __construct( $methods = array() )
@@ -84,19 +84,38 @@ class Methods_Class_Generator{
 		$file_handle = @fopen( $path , 'wb'  ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.file_system_read_fopen
 		if ( $file_handle ) {
 			fwrite( $file_handle, $content ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fwrite
-			fclose( $file_handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fclose
+			return fclose( $file_handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fclose
 		}
 	}
 
 	public function maybe_generate_class_file( $method_data = []  )
 	{
-		$method_file = $this->methods_dir . '/' . $this->method_file_name( $method_data  );
-
+		$method_file = $this->method_file_path( $method_data );
 		if( is_file( $method_file )  ){
+			$this->add_method_to_the_available ( $method_data , $method_file );
 			//return;
 		}
 
 		$this->generate_class_file( $method_file, $method_data );
+	}
+
+	public function add_method_to_the_available( $method_data , $method_file = false )
+	{
+		if( !$method_file ){
+			$method_file = $this->method_file_path( $method_data );
+		}
+
+		$replace_date = $this->replace_date ( $method_data );
+		$this->available_methods[ $replace_date[1] ] =  array(
+			'class_name' => $replace_date[0],
+			'file' 		=> $method_file,
+		);
+
+	}
+
+	public function method_file_path( $method_data )
+	{
+		return $this->methods_dir . '/' . $this->method_file_name( $method_data  );
 	}
 
 	public function method_file_name( $method_data )
@@ -105,9 +124,11 @@ class Methods_Class_Generator{
 		$gateway = isset( $method_data['gateway'] ) ? str_replace( ' ', '-' ,  strtolower( trim( $method_data['gateway'] ) ) ) : 'circlepay' ;
 		return 'class-' . $method . '-' . $gateway . '.php';
 	}
-
+	
 	public function generate_class_file( $method_file ,  $method_data ){
-		$this->create_file ( $method_file , $this->method_file_content( $method_data ));
+		if( $this->create_file ( $method_file , $this->method_file_content( $method_data )) ){
+			$this->add_method_to_the_available ( $method_data , $method_file );
+		}
 	}
 
 	public function method_file_content( $method_data )
@@ -124,10 +145,10 @@ class Methods_Class_Generator{
 	}
 
 	private function replace_date( $method_data ){
-		$name 	= $method_data['name'] .'_'; 
+		$name 	= str_replace( ' ' , '_' , $method_data['name'] ) .'_'; 
 		$name 	.= isset( $method_data['gateway'] ) ? $method_data['gateway'] : 'CirclePay';
 
-		$id 	= strtolower ( $method_data['name'] ) .'_';
+		$id 	= strtolower ( str_replace( ' ' , '_' , $method_data['name'] ) ) .'_';
 		$id 	.= isset( $method_data['gateway'] ) ? strtolower( $method_data['gateway'] ) : 'circlepay';
 
 		$title 	= $method_data['name'] .' ';
@@ -137,6 +158,11 @@ class Methods_Class_Generator{
 		$icon  	= $icon ?: CIRCLEPAY_PLUGIN_URL .'/assets/images/circlepay-logo.png';
 		
 		return array( $name, $id, $title, $icon );
+	}
+
+	public function get_available_methods()
+	{
+		return $this->available_methods;
 	}
 
 }
