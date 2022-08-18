@@ -33,11 +33,9 @@ class {{Method_Name_GateWay_Name}} extends WC_Payment_Gateway {
 	 * @return	array data of the payment process opened for this order
 	 */
 	public function process_payment( $order_id ) {
-		return array(
-			'result' => 'success',
-			'redirect' => 'https://www.youtube.com/'
-		);
+		require_once CIRCLEPAY_PLUGIN_DIR . 'core/classes/class-circlepay-methods-order-handler.php';
+		$handler = new CirclePay_Methods_Order_Handler( $order_id );
+		return $handler->process_payment();
 	}
-
 
 }
