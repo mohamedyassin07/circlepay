@@ -76,10 +76,10 @@ class CirclePay_Methods_Order_Handler{
 
 	public function process_payment()
 	{
+		
 		if( ! $this->order ){
 			return;
 		}
-
 		if( $this->mybe_create_customer() !== true ){
 			return;
 		}
@@ -126,7 +126,6 @@ class CirclePay_Methods_Order_Handler{
 		);
 
 		$response = $this->connection->create_customer( $customer_data );
-
 		if( is_object( $response ) && $response->errorCode !== 3111 ){
 			return wc_add_notice( $this->connection->error_full_message( $response ) , 'error' );
 		}
@@ -184,7 +183,7 @@ class CirclePay_Methods_Order_Handler{
 			return wc_add_notice( $this->connection->error_full_message( $response ) , 'error' );
 		}
 
-		$error =  $this->connection->plugin_error_obj( '001' , __('Something Went wrong' , 'circlepay' ) );
+		$error =  $this->connection->plugin_error_obj( '003' , __('Something Went wrong' , 'circlepay' ) );
 		return wc_add_notice( $this->connection->error_full_message( $error ) , 'error' );
 	}
 
