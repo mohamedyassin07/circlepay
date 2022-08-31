@@ -43,7 +43,7 @@ class Circlepay_Run{
 	private function add_hooks(){
 		add_action( 'plugin_action_links_' . CIRCLEPAY_PLUGIN_BASE, array( $this, 'add_plugin_action_link' ), 20 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_backend_scripts_and_styles' ), 20 );
-		add_action( 'plugins_loaded', array( $this, 'includes' ) );
+		add_action( 'woocommerce_after_register_post_type', array( $this, 'includes' ) );
 	}
 
 	/**
@@ -59,6 +59,11 @@ class Circlepay_Run{
 	{
 		require_once CIRCLEPAY_PLUGIN_DIR . 'core/classes/class-available-methods.php';
 		new CirclePay_Available_Methods;
+
+		if( isset( $_GET['order_token'] ) && ! empty( $_GET['order_token'] ) ){
+			require_once CIRCLEPAY_PLUGIN_DIR . 'core/classes/class-circlepay-methods-order-handler.php';
+			new CirclePay_Methods_Order_Handler;
+		}
 	}
 
 

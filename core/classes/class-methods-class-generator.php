@@ -148,9 +148,7 @@ class Methods_Class_Generator{
 		$name 	= str_replace( ' ' , '_' , $method_data['name'] ) .'_'; 
 		$name 	.= isset( $method_data['gateway'] ) ? $method_data['gateway'] : 'CirclePay';
 
-		$id 	= strtolower ( str_replace( ' ' , '_' , $method_data['name'] ) ) .'_';
-		$id 	.= isset( $method_data['gateway'] ) ? strtolower( $method_data['gateway'] ) : 'circlepay';
-		$id		.= '___' . $method_data['id'];
+		$id		= $method_data['id'];
 
 		$title 	= $method_data['name'] .' ';
 		$title	.= isset( $method_data['gateway'] ) ? $method_data['gateway'] : 'CirclePay';

@@ -102,8 +102,9 @@ class CirclePay_API{
 				'data_format' 	=> 'body'
 			)
 		);
-		if ( is_wp_error( $response ) ) {
-			return $this->error_obj( $response ) ;
+
+		if( $this->is_response_error( $response ) ){
+			return $this->error_obj( $response );
 		}
 
 		$response = json_decode( wp_remote_retrieve_body( $response ), true );
@@ -113,9 +114,6 @@ class CirclePay_API{
 		}
 
 
-		if( $this->is_response_error( $response ) ){
-			return $this->error_obj( $response );
-		}
 
 		return $response;
 	}
@@ -132,13 +130,13 @@ class CirclePay_API{
 
 	public function is_response_error( $response )
 	{
-		return isset( $response['isError'] ) && $response['isError'] ? true : false;
+		return is_wp_error( $response ) ||  ( isset( $response['isError'] ) && $response['isError'] ) ? true : false;
 	}
 
 	public function error_obj( $response )
 	{		
 		if( is_wp_error( $response ) ){
-			$error_obj 				= new stdObject();
+			$error_obj 				= new stdClass;
 			$error_obj->message 	= __( 'Something went wrong in setup the connection: ', 'circlepay' );
 			$error_obj->details 	= $response->get_error_message();
 			$error_obj->errorCode 	= "cpp000";
@@ -195,5 +193,10 @@ class CirclePay_API{
 	public function pay_invoice( $data ){
 		$url = $this->get_connection_url( 'invoice/pay' );
 		return $this->create_connection( $url, 'POST' , $data );
+	}
+
+	public function get_invoice( $invoice_number ){
+		$url = $this->get_connection_url( 'invoice/get', $invoice_number );
+		return $this->create_connection( $url, 'GET' );
 	}	
 }

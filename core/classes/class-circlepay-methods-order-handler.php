@@ -57,21 +57,95 @@ class CirclePay_Methods_Order_Handler{
 	 */
 	public $connection;
 
+	/**
+	 * WooComerce API Webhook url slug
+	 *
+	 * @var		string
+	 * @since   1.0.0
+	 */
+	public $webhook_slug;
 	
-	public function __construct( $order_id ){
+
+	public function __construct( $order_id = false ){
+
+		if( ! $order_id  && ( ! isset( $_GET['order_token'] ) || empty( $_GET['order_token'] ) ) ){
+			return;
+		}
+
 		$this->set_order( $order_id );
+		$this->set_webhook_slug();
 		$this->set_connection();
+		
+		if( isset( $_GET['order_token'] ) ){
+			$this->add_wc_webhook();
+		}
+	}
+
+	public function add_wc_webhook(){
+		add_action( 'woocommerce_api_' . $this->webhook_slug , array( $this , 'order_confirmation_webhook' ) );
+	}
+
+	private function is_paid_circlepay_invoice(){
+		return false;
+		$invoice_num = get_post_meta( $this->order_id ,'circlepay_invoice_number' , true  );
+		$response 		= $this->connection->get_invoice( $invoice_num );
+
+		if( $this->connection->is_response_error( $response ) ){
+			return false;
+		}
+
+		if( is_array( $response ) && isset( $response['data'] ) && isset( $response['data'][0] ) && isset( $response['data'][0]['status'] ) && $response['data'][0]['status'] === 1 ){
+			return true;
+		}
+
+		return false;
+	}
+
+	private function complete_the_order()
+	{
+		$this->order->payment_complete();
+		wc_reduce_stock_levels( $this->order_id );
+		
+		global $woocommerce;
+		$woocommerce->cart->empty_cart(); 
+	}
+
+	private function fail_the_order(){
+		$this->order->update_status('failed');	
+		echo __( "Payment did completed correctly" , 'circlepay');
+		header( 'HTTP/1.1 200 OK' );
+		die();
+	}
+
+	public function order_confirmation_webhook()
+	{
+		if( $this->is_paid_circlepay_invoice() ){
+			$this->complete_the_order();
+			wp_redirect( $this->order->get_checkout_order_received_url() );
+		}else {
+			// if something went wrong
+			// or not paid yet
+			$this->fail_the_order();
+		}
 	}
 
 	public function set_order( $order_id )
 	{
+		if( ! $order_id ){
+			$order_id = (int)$_GET['order_token'];
+		}
+
 		$this->order_id = $order_id;
-		$this->order 	= new WC_Order( $order_id );
+		$this->order 	= wc_get_order( $this->order_id );
 	}
 
 	public function set_connection(){
 		require_once CIRCLEPAY_PLUGIN_DIR . 'core/classes/class-api-connection.php';
 		$this->connection = new CirclePay_API;
+	}
+
+	public function set_webhook_slug(){
+		$this->webhook_slug = 'circlepay_order_confirmation';
 	}
 
 	public function process_payment()
@@ -80,6 +154,7 @@ class CirclePay_Methods_Order_Handler{
 		if( ! $this->order ){
 			return;
 		}
+
 		if( $this->mybe_create_customer() !== true ){
 			return;
 		}
@@ -91,7 +166,7 @@ class CirclePay_Methods_Order_Handler{
 		if( $this->pay_invoice() !== true ){
 			return;
 		}
-
+		return;
 		if( $this->every_thing_done() ){
 			return;
 		}
@@ -135,14 +210,6 @@ class CirclePay_Methods_Order_Handler{
 
 	public function create_invoice()
 	{
-
-		// echo "ssss " . date_default_timezone_get();
-		// $timezone = date_default_timezone_get();
-		// echo "The current server timezone is: " . $timezone;
-		// date_default_timezone_set('Australia/Melbourne');
-		// $date = ;
-
-		// echo $date
 		$data = array(
 			'invoice' => array(
 				'customer_mobile' => $this->order->get_billing_phone(),
@@ -176,6 +243,11 @@ class CirclePay_Methods_Order_Handler{
 
 		if( is_array( $response ) && isset( $response['data'] ) && isset( $response['data'][0] ) && isset( $response['data'][0]['invoice_number'] ) ){
 			$this->invoice_number = $response['data'][0]['invoice_number'];
+			return update_post_meta( $this->order_id , 'circlepay_invoice_number', $response['data'][0]['invoice_number'] );
+		}
+
+		if( update_post_meta( $this->order_id , 'circlepay_transaction_id', $response['data'][0]['transaction_id'] ) ){
+			$this->invoice_url = $response['data'][0]['invoice_url'];
 			return true;
 		}
 
@@ -192,14 +264,10 @@ class CirclePay_Methods_Order_Handler{
 		$data = array(
 			'customer_mobile'	=> $this->order->get_billing_phone(),
 			'invoice_number'	=> $this->invoice_number,
-			// 'return_url'		=> ''
+			'payment_method_id'	=> $this->order->get_payment_method(),
+			'redirect_url' 		=> $this->return_url(),
 		);
-
-		$method_id = explode( '___' , $this->order->get_payment_method() );
-		if( isset( $method_id['1'] ) ){
-			$data['payment_method_id'] = $method_id['1'];
-		}
-
+		
 		$response = $this->connection->pay_invoice( $data ) ;
 
 		if( is_array( $response ) && isset( $response['data'] ) && isset( $response['data'][0] ) && isset( $response['data'][0]['invoice_url'] ) ){
@@ -216,7 +284,11 @@ class CirclePay_Methods_Order_Handler{
 		$error =  $this->connection->plugin_error_obj( '002' , __('Something Went wrong' , 'circlepay' ) );
 		return wc_add_notice( $this->connection->error_full_message( $error ) , 'error' );
 	}
+
+	public function return_url()
+	{
+		$token = $this->order_id;
+		return WC()->api_request_url( $this->webhook_slug ) . '?order_token=' . $token ;
+	}
 }
-
-
 
