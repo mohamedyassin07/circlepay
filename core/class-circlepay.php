@@ -48,7 +48,7 @@ if ( ! class_exists( 'Circlepay' ) ) :
 		 *
 		 * @access	public
 		 * @since	1.0.0
-		 * @return	void
+		 * @return	Void
 		 */
 		public function __clone() {
 			_doing_it_wrong( __FUNCTION__, __( 'You are not allowed to clone this class.', 'circlepay' ), '1.0.0' );
@@ -59,7 +59,7 @@ if ( ! class_exists( 'Circlepay' ) ) :
 		 *
 		 * @access	public
 		 * @since	1.0.0
-		 * @return	void
+		 * @return	Void
 		 */
 		public function __wakeup() {
 			_doing_it_wrong( __FUNCTION__, __( 'You are not allowed to unserialize this class.', 'circlepay' ), '1.0.0' );
@@ -102,7 +102,7 @@ if ( ! class_exists( 'Circlepay' ) ) :
 		 *
 		 * @access  private
 		 * @since   1.0.0
-		 * @return  void
+		 * @return  Void
 		 */
 		private function includes() {
 			require_once CIRCLEPAY_PLUGIN_DIR . 'core/classes/class-helpers.php';
@@ -115,7 +115,7 @@ if ( ! class_exists( 'Circlepay' ) ) :
 		 *
 		 * @access  private
 		 * @since   1.0.0
-		 * @return  void
+		 * @return  Void
 		 */
 		private function base_hooks() {
 			add_action( 'plugins_loaded', array( self::$instance, 'load_textdomain' ) );
@@ -126,7 +126,7 @@ if ( ! class_exists( 'Circlepay' ) ) :
 		 *
 		 * @access  public
 		 * @since   1.0.0
-		 * @return  void
+		 * @return  Void
 		 */
 		public function load_textdomain() {
 			load_plugin_textdomain( 'circlepay', FALSE, dirname( plugin_basename( CIRCLEPAY_PLUGIN_FILE ) ) . '/languages/' );

@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * @package		CIRCLEPAY
  * @subpackage	Classes/WC_Gateway_CirclePay
  * @author		CirclePay
- * @since		1.6.0
+ * @since		1.0.0
  */
 
 class WC_Gateway_CirclePay extends WC_Payment_Gateway {
@@ -21,10 +21,16 @@ class WC_Gateway_CirclePay extends WC_Payment_Gateway {
 	 * checkbox true value
 	 *
 	 * @var		string
-	 * @since   1.6.0
+	 * @since   1.0.0
 	 */
 	private $checkbox_true_val =  'yes';
 
+	/**
+	 * Define the payment gateway defults
+	 *
+	 * @var		string
+	 * @since   1.0.0
+	 */
 	public function __construct(){
 
 		$this->set_generel_settings();
@@ -33,6 +39,12 @@ class WC_Gateway_CirclePay extends WC_Payment_Gateway {
 		$this->set_frontend_settings();
 	}
 
+	/**
+	 * Set generel settings
+	 *
+	 * @var		string
+	 * @since   1.0.0
+	 */
 	public function set_generel_settings()
 	{
 		$this->id = CIRCLEPAY_SLUG;
@@ -44,20 +56,11 @@ class WC_Gateway_CirclePay extends WC_Payment_Gateway {
 		);	
 	}
 
-	public function set_frontend_settings()
-	{
-		$this->title = $this->get_option( 'title' );
-		$this->description = $this->get_option( 'description' );
-		$this->icon = CIRCLEPAY_PLUGIN_URL .'/assets/images/circlepay-logo.png';
-	}
-
-
 	/**
 	 * Registers WooCommerce Admin Fields
 	 * 
 	 * @access	public
-	 * @since	1.6.0
-	 * @return	void
+	 * @since	1.0.0
 	 */
 	public function init_form_fields()
 	{
@@ -104,4 +107,18 @@ class WC_Gateway_CirclePay extends WC_Payment_Gateway {
 			),			
 		);			
 	}
+	
+	/**
+	 * Set frontend settings
+	 *
+	 * @var		string
+	 * @since   1.0.0
+	 */
+	public function set_frontend_settings()
+	{
+		$this->title = $this->get_option( 'title' );
+		$this->description = $this->get_option( 'description' );
+		$this->icon = CIRCLEPAY_PLUGIN_URL .'/assets/images/circlepay-logo.png';
+	}
+
 }

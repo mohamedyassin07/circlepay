@@ -53,13 +53,23 @@ class CirclePay_API{
 	 */
 	protected $api_url;
 
-
+	/**
+	 * Connection constructor 
+	 *
+	 * @since 1.0.0
+	 */
 	public function __construct()
 	{
 		$this->set_connection_basics();
 	}
 
-	private function set_connection_basics()
+	/**
+	 * Set the connection basics info
+	 *
+	 * @access  public
+	 * @since   1.0.0
+	 */
+	protected function set_connection_basics()
 	{
 		$circlepay_data 		= get_option( 'woocommerce_circlepay_settings');
 		$this->account_key 		= sanitize_text_field( $circlepay_data['account_key'] );
@@ -69,16 +79,11 @@ class CirclePay_API{
 		$this->api_url 			= $this->sandbox ? 'https://sandbox-openapi.circlepay.ai/' : 'https://sandbox-openapi.circlepay.ai/';
 	}
 
-	public function get_connection_url( $endpoint_base , $id = false )
-	{
-		return $this->api_url . trim( $endpoint_base ) . ( $id ? '/' . $id : '' ) ;
-	}
-
 	/**
 	 * Execute a connection to CirclePay API
 	 * @access	public
-	 * @since	1.6.0
-	 * @return	array|string	needed data as array or string error message
+	 * @since	1.0.0
+	 * @return	Array|String needed data as array or string error message
 	 */
 	public function create_connection( $endpoint_url, $type, $body = array() )
 	{
@@ -113,13 +118,22 @@ class CirclePay_API{
 			return $this->plugin_error_obj( '004' , __('No Response from CirclePay Server' , 'circlepay' ) );
 		}
 
-
-
 		return $response;
 	}
-	public function is_connection_error( $response )
+		
+	/**
+	 * Check if their is an error in the response
+	 * @access	public
+	 * @since	1.0.0
+	 * @return	Boolean
+	 */
+	public function is_response_error( $response )
 	{
 		if(
+			is_wp_error( $response )
+			||
+			( isset( $response['isError'] ) && $response['isError'] )
+			||
 			( is_array( $response) && isset( $response['error'] ) && ! empty( $response['error'] ) && $response['status']  )
 			||
 			( is_object( $response ) && property_exists( $response, 'error') &&  ! empty( $response->error  ) && $response->status )
@@ -128,11 +142,12 @@ class CirclePay_API{
 		}
 	}
 
-	public function is_response_error( $response )
-	{
-		return is_wp_error( $response ) ||  ( isset( $response['isError'] ) && $response['isError'] ) ? true : false;
-	}
-
+	/**
+	 * Check if their is an error in the response
+	 * @access	public
+	 * @since	1.0.0
+	 * @return	Object	error object
+	 */
 	public function error_obj( $response )
 	{		
 		if( is_wp_error( $response ) ){
@@ -149,6 +164,12 @@ class CirclePay_API{
 		return $error_obj;
 	}
 
+	/**
+	 * create a custom error object
+	 * @access	public
+	 * @since	1.0.0
+	 * @return	Object	error object
+	 */
 	public function plugin_error_obj( $code , $message, $details = '' ){
 		$error = array (
 			'errorCode' => 'cpp' . $code,
@@ -158,17 +179,43 @@ class CirclePay_API{
 		return $this->error_obj( $error );
 	}
 
+	/**
+	 * Get Connection url
+	 *
+	 * @access  public
+	 * @since   1.0.0
+	 * @return  String
+	 */
+	public function get_connection_url( $endpoint_base , $id = false )
+	{
+		return $this->api_url . trim( $endpoint_base ) . ( $id ? '/' . $id : '' ) ;
+	}
+
+	/**
+	 * Full error Message
+	 * @access	public
+	 * @since	1.0.0
+	 * @return	String
+	 */
 	public function error_full_message( $error )
 	{
 		return "({$error->errorCode}) {$error->message} : $error->details";
 	}
 
-	public function payment_gateways(){
+	/*
+	|--------------------------------------------------------------------------
+	| CirclePay endpoints connections
+	|--------------------------------------------------------------------------
+	*/
+
+	public function payment_gateways()
+	{
 		$url = $this->get_connection_url( 'payment/gateway/list' );
 		return $this->create_connection( $url, 'GET');
 	}
 
-	public function enabled_payment_gateways(){
+	public function enabled_payment_gateways()
+	{
 		$url = $this->get_connection_url( 'merchants/payment/gateway/list' );
 		return $this->create_connection( $url, 'GET');
 	}
@@ -185,17 +232,20 @@ class CirclePay_API{
 		return $this->create_connection( $url, 'POST', $data );
 	}
 	
-	public function create_invoice( $data ){
+	public function create_invoice( $data )
+	{
 		$url = $this->get_connection_url( 'invoice/create' );
 		return $this->create_connection( $url, 'POST' , $data );
 	}
 
-	public function pay_invoice( $data ){
+	public function pay_invoice( $data )
+	{
 		$url = $this->get_connection_url( 'invoice/pay' );
 		return $this->create_connection( $url, 'POST' , $data );
 	}
 
-	public function get_invoice( $invoice_number ){
+	public function get_invoice( $invoice_number )
+	{
 		$url = $this->get_connection_url( 'invoice/get', $invoice_number );
 		return $this->create_connection( $url, 'GET' );
 	}	

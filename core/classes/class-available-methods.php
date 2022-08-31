@@ -14,14 +14,10 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class CirclePay_Available_Methods{
 
 	/**
-	 * The API Enviroment Status
+	 * Set required hooks
 	 *
-	 * @var		string
-	 * @since   1.0.0
+	 * @since 1.0.0
 	 */
-	protected $sandbox;
-
-
 	public function __construct()
 	{
 		add_filter( 'woocommerce_payment_gateways', array( $this,'add_circlepay_method_to_wc' ) );
@@ -29,12 +25,29 @@ class CirclePay_Available_Methods{
 		add_filter( 'woocommerce_checkout_fields' , array( $this, 'override_checkout_fields' ) );
 	}
 
-	public function add_circlepay_method_to_wc( $gateways ) {
+	/**
+	 * Add CirclePay method to WooCommerce admin dashboard
+	 *
+	 * @access  public
+	 * @since   1.0.0
+	 * @return  Array
+	 */
+	public function add_circlepay_method_to_wc( $gateways )
+	{
 		require_once CIRCLEPAY_PLUGIN_DIR . 'core/classes/class-wc-gateway-circlepay.php';
 		$gateways[] = 'WC_Gateway_CirclePay'; 
 		return $gateways;
 	}
 
+	/**
+	 * Add CirclePay available methods to WooCommerce front end 
+	 * in customers experience
+	 * and remove the ciclepay as an available wc payment method for the the customers
+	 *
+	 * @access  public
+	 * @since   1.0.0
+	 * @return  Array
+	 */
 	public function add_circlepay_available_methods_to_wc( $available_gateways )
 	{
 		// we need this function to work only
@@ -55,6 +68,13 @@ class CirclePay_Available_Methods{
 		return $available_gateways;
 	}
 
+	/**
+	 * Get CirclePay available methods 
+	 *
+	 * @access  public
+	 * @since   1.0.0
+	 * @return  Array
+	 */
 	public function circlepay_available_methods()
 	{
 		$available_methods = [];
@@ -80,11 +100,21 @@ class CirclePay_Available_Methods{
 			}
 		}
 
-		update_option( 'circlepay_available_methods' , $available_methods );
 		return $available_methods ;
 	}
-	public function override_checkout_fields( $fields ) {
 
+	/**
+	 * Override Checkout Fields
+	 * to be sure that their is a phone field
+	 * also to set the label and the placeholder to notify the user
+	 * about the required phone format
+	 *
+	 * @access  public
+	 * @since   1.0.0
+	 * @return  Array
+	 */
+	public function override_checkout_fields( $fields )
+	{
 		if( isset( $fields['billing']['billing_phone'] ) ){
 			$fields['billing']['billing_phone']['label'] 		= __( 'Pone (International Format)', 'circlepay' );
 			$fields['billing']['billing_phone']['placeholder'] 	= __( 'Must be inetrnational format : +20123456789', 'circlepay' );

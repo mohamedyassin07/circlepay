@@ -21,8 +21,13 @@ class Methods_Class_Generator{
 	 */
 	protected $available_methods = [];
 
-
-	public function __construct( $methods = array() )
+	/**
+	 * Run methods generator class fundamentals
+	 *
+	 * @access  public
+	 * @since   1.0.0
+	 */
+	public function __construct( $methods = [] )
 	{
 		if( empty( $methods) ){
 			return;
@@ -40,6 +45,12 @@ class Methods_Class_Generator{
 
 	}
 
+	/**
+	 * Set the generator defaults
+	 *
+	 * @access  public
+	 * @since   1.0.0
+	 */
 	public function set_defaults()
 	{
 		$this->methods_dir 		= trailingslashit ( WP_PLUGIN_DIR . '/' . CIRCLEPAY_SLUG . '_available_methods/classes' );
@@ -47,6 +58,12 @@ class Methods_Class_Generator{
 		$this->sample_content 	= file_get_contents( $this->sample_file );
 	}
 
+	/**
+	 * Create generated methods directory 
+	 *
+	 * @access  public
+	 * @since   1.0.0
+	 */
 	public function create_methods_dir()
 	{
 		$files = array(
@@ -79,6 +96,12 @@ class Methods_Class_Generator{
 		}
 	}
 
+	/**
+	 * Create a file
+	 *
+	 * @access  public
+	 * @since   1.0.0
+	 */
 	private function create_file( $path , $content )
 	{
 		$file_handle = @fopen( $path , 'wb'  ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.file_system_read_fopen
@@ -88,6 +111,12 @@ class Methods_Class_Generator{
 		}
 	}
 
+	/**
+	 * Create generated method  file if not exist 
+	 *
+	 * @access  public
+	 * @since   1.0.0
+	 */
 	public function maybe_generate_class_file( $method_data = []  )
 	{
 		$method_file = $this->method_file_path( $method_data );
@@ -99,6 +128,12 @@ class Methods_Class_Generator{
 		$this->generate_class_file( $method_file, $method_data );
 	}
 
+	/**
+	 * Add the method to the available methods
+	 *
+	 * @access  public
+	 * @since   1.0.0
+	 */
 	public function add_method_to_the_available( $method_data , $method_file = false )
 	{
 		if( !$method_file ){
@@ -113,11 +148,25 @@ class Methods_Class_Generator{
 
 	}
 
+	/**
+	 * Get the Method file path
+	 *
+	 * @access  public
+	 * @since   1.0.0
+	 * @return  String
+	 */
 	public function method_file_path( $method_data )
 	{
 		return $this->methods_dir . '/' . $this->method_file_name( $method_data  );
 	}
 
+	/**
+	 * Get the Method file name
+	 *
+	 * @access  public
+	 * @since   1.0.0
+	 * @return  String
+	 */
 	public function method_file_name( $method_data )
 	{
 		$method = str_replace( ' ', '-' ,  strtolower( trim( $method_data['name'] ) ) ) ;
@@ -125,12 +174,25 @@ class Methods_Class_Generator{
 		return 'class-' . $method . '-' . $gateway . '.php';
 	}
 	
+	/**
+	 * Generate the method class file
+	 *
+	 * @access  public
+	 * @since   1.0.0
+	 */
 	public function generate_class_file( $method_file ,  $method_data ){
 		if( $this->create_file ( $method_file , $this->method_file_content( $method_data )) ){
 			$this->add_method_to_the_available ( $method_data , $method_file );
 		}
 	}
 
+	/**
+	 * Generate the method file content
+	 *
+	 * @access  public
+	 * @since   1.0.0
+	 * @return  String
+	 */
 	public function method_file_content( $method_data )
 	{
 		$search = array(
@@ -144,7 +206,14 @@ class Methods_Class_Generator{
 		return str_replace( $search, $replace, $this->sample_content );
 	}
 
-	private function replace_date( $method_data ){
+	/**
+	 * Replace demo data with the method real data
+	 *
+	 * @access  public
+	 * @since   1.0.0
+	 * @return  Array
+	 */
+	public function replace_date( $method_data ){
 		$name 	= str_replace( ' ' , '_' , $method_data['name'] ) .'_'; 
 		$name 	.= isset( $method_data['gateway'] ) ? $method_data['gateway'] : 'CirclePay';
 
@@ -159,6 +228,13 @@ class Methods_Class_Generator{
 		return array( $name, $id, $title, $icon );
 	}
 
+	/**
+	 * Get available methods
+	 *
+	 * @access  public
+	 * @since   1.0.0
+	 * @return  Array
+	 */
 	public function get_available_methods()
 	{
 		return $this->available_methods;

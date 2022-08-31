@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * @package		CIRCLEPAY
  * @subpackage	Classes/{{Method_Name_GateWay_Name}}
  * @author		Payzaty
- * @since		1.6.0
+ * @since		1.0.0
  */
 class {{Method_Name_GateWay_Name}} extends WC_Payment_Gateway {
 
@@ -28,7 +28,7 @@ class {{Method_Name_GateWay_Name}} extends WC_Payment_Gateway {
 	 * Process the payment
 	 *
 	 * @access	public
-	 * @since	1.6.0
+	 * @since	1.0.0
 	 * @param	string $order_id is the current order id
 	 * @return	array data of the payment process opened for this order
 	 */

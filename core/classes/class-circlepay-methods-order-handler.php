@@ -65,9 +65,14 @@ class CirclePay_Methods_Order_Handler{
 	 */
 	public $webhook_slug;
 	
-
-	public function __construct( $order_id = false ){
-
+	/**
+	 * Set the order handler basics
+	 *
+	 * @access  public
+	 * @since   1.0.0
+	 */
+	public function __construct( $order_id = false )
+	{
 		if( ! $order_id  && ( ! isset( $_GET['order_token'] ) || empty( $_GET['order_token'] ) ) ){
 			return;
 		}
@@ -77,58 +82,16 @@ class CirclePay_Methods_Order_Handler{
 		$this->set_connection();
 		
 		if( isset( $_GET['order_token'] ) ){
-			$this->add_wc_webhook();
+			add_action( 'woocommerce_api_' . $this->webhook_slug , array( $this , 'order_confirmation_webhook' ) );
 		}
 	}
 
-	public function add_wc_webhook(){
-		add_action( 'woocommerce_api_' . $this->webhook_slug , array( $this , 'order_confirmation_webhook' ) );
-	}
-
-	private function is_paid_circlepay_invoice(){
-		return false;
-		$invoice_num = get_post_meta( $this->order_id ,'circlepay_invoice_number' , true  );
-		$response 		= $this->connection->get_invoice( $invoice_num );
-
-		if( $this->connection->is_response_error( $response ) ){
-			return false;
-		}
-
-		if( is_array( $response ) && isset( $response['data'] ) && isset( $response['data'][0] ) && isset( $response['data'][0]['status'] ) && $response['data'][0]['status'] === 1 ){
-			return true;
-		}
-
-		return false;
-	}
-
-	private function complete_the_order()
-	{
-		$this->order->payment_complete();
-		wc_reduce_stock_levels( $this->order_id );
-		
-		global $woocommerce;
-		$woocommerce->cart->empty_cart(); 
-	}
-
-	private function fail_the_order(){
-		$this->order->update_status('failed');	
-		echo __( "Payment did completed correctly" , 'circlepay');
-		header( 'HTTP/1.1 200 OK' );
-		die();
-	}
-
-	public function order_confirmation_webhook()
-	{
-		if( $this->is_paid_circlepay_invoice() ){
-			$this->complete_the_order();
-			wp_redirect( $this->order->get_checkout_order_received_url() );
-		}else {
-			// if something went wrong
-			// or not paid yet
-			$this->fail_the_order();
-		}
-	}
-
+	/**
+	 * Set Order ID
+	 *
+	 * @access  public
+	 * @since   1.0.0
+	 */
 	public function set_order( $order_id )
 	{
 		if( ! $order_id ){
@@ -139,15 +102,35 @@ class CirclePay_Methods_Order_Handler{
 		$this->order 	= wc_get_order( $this->order_id );
 	}
 
-	public function set_connection(){
+	/**
+	 * Set webhook slug
+	 *
+	 * @access  public
+	 * @since   1.0.0
+	 */
+	public function set_webhook_slug()
+	{
+		$this->webhook_slug = 'circlepay_order_confirmation';
+	}
+
+	/**
+	 * Set CirclePay connection
+	 *
+	 * @access  public
+	 * @since   1.0.0
+	 */
+	public function set_connection()
+	{
 		require_once CIRCLEPAY_PLUGIN_DIR . 'core/classes/class-api-connection.php';
 		$this->connection = new CirclePay_API;
 	}
 
-	public function set_webhook_slug(){
-		$this->webhook_slug = 'circlepay_order_confirmation';
-	}
-
+	/**
+	 * Process the Payment transaction
+	 *
+	 * @access  public
+	 * @since   1.0.0
+	 */
 	public function process_payment()
 	{
 		
@@ -166,7 +149,7 @@ class CirclePay_Methods_Order_Handler{
 		if( $this->pay_invoice() !== true ){
 			return;
 		}
-		return;
+
 		if( $this->every_thing_done() ){
 			return;
 		}
@@ -175,14 +158,6 @@ class CirclePay_Methods_Order_Handler{
 			'result' => 'success',
 			'redirect' => $this->invoice_url
 		);
-	}
-
-	public function every_thing_done()
-	{
-		if( ! $this->invoice_url ){
-			$error =  $this->connection->plugin_error_obj( '001' , __('Something Went wrong' , 'circlepay' ) );
-			return wc_add_notice( $this->connection->error_full_message( $error ) , 'error' );
-		}
 	}
 
 	/**
@@ -208,6 +183,13 @@ class CirclePay_Methods_Order_Handler{
 		return true;
 	}
 
+	/**
+	 * create_invoice
+	 *
+	 * @access  public
+	 * @since   1.0.0
+	 * @return  Boolean
+	 */
 	public function create_invoice()
 	{
 		$data = array(
@@ -259,6 +241,13 @@ class CirclePay_Methods_Order_Handler{
 		return wc_add_notice( $this->connection->error_full_message( $error ) , 'error' );
 	}
 
+	/**
+	 * Pay Invoice
+	 *
+	 * @access  public
+	 * @since   1.0.0
+	 * @return  Boolean
+	 */
 	public function pay_invoice()
 	{
 		$data = array(
@@ -285,10 +274,103 @@ class CirclePay_Methods_Order_Handler{
 		return wc_add_notice( $this->connection->error_full_message( $error ) , 'error' );
 	}
 
+	/**
+	 * Check if all done that we have an invoice url
+	 *
+	 * @access  public
+	 * @since   1.0.0
+	 * @return  Boolean
+	 */
+	public function every_thing_done()
+	{
+		if( ! $this->invoice_url ){
+			$error =  $this->connection->plugin_error_obj( '001' , __('Something Went wrong' , 'circlepay' ) );
+			return wc_add_notice( $this->connection->error_full_message( $error ) , 'error' );
+		}
+	}
+
+	/**
+	 * Get the return url
+	 *
+	 * @access  public
+	 * @since   1.0.0
+	 * @return  String
+	 */
 	public function return_url()
 	{
 		$token = $this->order_id;
 		return WC()->api_request_url( $this->webhook_slug ) . '?order_token=' . $token ;
+	}
+
+		/**
+	 * Order confirmation webhook Callback
+	 *
+	 * @access  public
+	 * @since   1.0.0
+	 */
+	public function order_confirmation_webhook()
+	{
+		if( $this->is_paid_circlepay_invoice() ){
+			$this->complete_the_order();
+			wp_redirect( $this->order->get_checkout_order_received_url() );
+		}else {
+			// if something went wrong
+			// or not paid yet
+			$this->fail_the_order();
+		}
+	}
+
+	/**
+	 * Check if the CirclePay invoice is paid
+	 *
+	 * @access  public
+	 * @since   1.0.0
+	 * @return  Boolean
+	 */
+	private function is_paid_circlepay_invoice()
+	{
+		return false;
+		$invoice_num = get_post_meta( $this->order_id ,'circlepay_invoice_number' , true  );
+		$response 		= $this->connection->get_invoice( $invoice_num );
+
+		if( $this->connection->is_response_error( $response ) ){
+			return false;
+		}
+
+		if( is_array( $response ) && isset( $response['data'] ) && isset( $response['data'][0] ) && isset( $response['data'][0]['status'] ) && $response['data'][0]['status'] === 1 ){
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Set the order as completed
+	 *
+	 * @access  public
+	 * @since   1.0.0
+	 */
+	private function complete_the_order()
+	{
+		$this->order->payment_complete();
+		wc_reduce_stock_levels( $this->order_id );
+		
+		global $woocommerce;
+		$woocommerce->cart->empty_cart(); 
+	}
+
+	/**
+	 * Set the order as failed
+	 *
+	 * @access  public
+	 * @since   1.0.0
+	 */
+	private function fail_the_order()
+	{
+		$this->order->update_status('failed');	
+		echo __( "Payment did completed correctly" , 'circlepay');
+		header( 'HTTP/1.1 200 OK' );
+		die();
 	}
 }
 
