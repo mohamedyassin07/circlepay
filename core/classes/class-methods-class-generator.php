@@ -215,15 +215,16 @@ class Methods_Class_Generator{
 	 */
 	public function replace_date( $method_data ){
 		$name 	= str_replace( ' ' , '_' , $method_data['name'] ) .'_'; 
-		$name 	.= isset( $method_data['gateway'] ) ? $method_data['gateway'] : 'CirclePay';
+		$name 	.= isset( $method_data['payment_gateway_name'] ) ? $method_data['payment_gateway_name'] : 'CirclePay';
 
 		$id		= $method_data['id'];
 
 		$title 	= $method_data['name'] .' ';
-		$title	.= isset( $method_data['gateway'] ) ? $method_data['gateway'] : 'CirclePay';
+		$title	.= isset( $method_data['payment_gateway_name'] ) ? $method_data['payment_gateway_name'] : 'CirclePay';
 
-		$icon	= isset( $method_data['icon'] ) ? $method_data['icon'] : false;
-		$icon  	= $icon ?: CIRCLEPAY_PLUGIN_URL .'/assets/images/circlepay-logo.png';
+		$icon	= isset( $method_data['payment_method_url'] ) ? $method_data['payment_method_url'] : false;
+		$icon 	= CIRCLEPAY_PLUGIN_URL .'/assets/images/circlepay-light-logo.png';
+		$icon  	= CIRCLEPAY_PLUGIN_URL .'/assets/images/circlepay-logo.jpg';
 		
 		return array( $name, $id, $title, $icon );
 	}

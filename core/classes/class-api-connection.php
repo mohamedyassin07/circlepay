@@ -115,7 +115,7 @@ class CirclePay_API{
 		$response = json_decode( wp_remote_retrieve_body( $response ), true );
 
 		if( empty( $response ) ){
-			return $this->plugin_error_obj( '004' , __('No Response from CirclePay Server' , 'circlepay' ) );
+			return $this->plugin_error_obj( '004' , __('Empty response body from CirclePay server' , 'circlepay' ) );
 		}
 
 		return $response;
@@ -132,11 +132,13 @@ class CirclePay_API{
 		if(
 			is_wp_error( $response )
 			||
+			( is_object( $response ) && property_exists( $response, 'error') &&  ! empty( $response->error  ) && $response->status )
+			||
 			( isset( $response['isError'] ) && $response['isError'] )
 			||
 			( is_array( $response) && isset( $response['error'] ) && ! empty( $response['error'] ) && $response['status']  )
 			||
-			( is_object( $response ) && property_exists( $response, 'error') &&  ! empty( $response->error  ) && $response->status )
+			( is_array( $response) && isset( $response['errorCode'] ) && $response['errorCode'] !== 0 )
 		){
 			return true;
 		}
@@ -172,7 +174,7 @@ class CirclePay_API{
 	 */
 	public function plugin_error_obj( $code , $message, $details = '' ){
 		$error = array (
-			'errorCode' => 'cpp' . $code,
+			'errorCode' => 'cpp' . $code, //{c}ircle{p}ay{p}lugin
 			'message' => $message,
 			'details'=> $details
 		);

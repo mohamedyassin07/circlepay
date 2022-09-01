@@ -184,7 +184,7 @@ class CirclePay_Methods_Order_Handler{
 	}
 
 	/**
-	 * create_invoice
+	 * Create invoice
 	 *
 	 * @access  public
 	 * @since   1.0.0
@@ -302,7 +302,74 @@ class CirclePay_Methods_Order_Handler{
 		return WC()->api_request_url( $this->webhook_slug ) . '?order_token=' . $token ;
 	}
 
-		/**
+	/**
+	 * Create invoice V2
+	 *
+	 * @access  public
+	 * @since   1.0.0
+	 * @return  Boolean
+	 */
+	public function create_invoice_v2()
+	{
+		$data = array (
+			'payment_method_id'	=> $this->order->get_payment_method(),
+			'redirect_url'		=> $this->return_url(),
+			'status'			=> 0,
+			'sub_total_value'	=> $this->order->get_subtotal(),
+			'tax'				=> $this->order->get_taxes(),
+			'tax_value'			=> $this->order->get_tax_totals(),
+			'total_value'		=> $this->order->get_total(),
+
+			'customer' => array(
+				'address'		=> $this->order->get_billing_address_1(), 
+				'city'			=> $this->order->get_billing_city(),
+				'country'		=> $this->order->get_billing_country(),
+				'email'			=> $this->order->get_billing_email(),
+				'first_name'	=> $this->order->get_billing_first_name(),
+				'last_name'		=> $this->order->get_billing_last_name(),
+				'mobile_number'	=> $this->order->get_billing_phone()
+			),
+
+			'invoice' => array(
+				'custom_attributes' => array(
+					'cust_1' => 'val_1',
+					'cust_2' => 'val_2'
+				),
+				'due_date' 					=> date( 'Y-m-d', strtotime("+1 day") ),
+				'discount_value_calculated' => 0,
+				'items' 					=> array(
+					// due to that circlepay need every thing detailed 
+					// then it will calculate the total itself
+					// which not suitable with 100% of the plugins 
+					// which perhaps change the prices, copouns ,totals dynamically
+					// so we will add all items as one item
+					array(
+						'name'		=> $this->order->get_item_count() . ' ' . __( 'Products' ,  'circlepay' ),
+						'price'		=> $this->order->get_total(),
+						'quantity'	=> 1
+					)
+				),
+
+			),
+		);
+
+		$response = $this->connection->create_invoice_v2( $data ) ;
+
+		if( is_array( $response ) && isset( $response['data'] ) && isset( $response['data'][0] ) && isset( $response['data'][0]['transaction_id'] ) ){
+			$this->transaction_id = $response['data'][0]['transaction_id'];
+			$this->invoice_url = $response['data'][0]['invoice_url'];
+			return true;
+		}
+
+		if( is_object( $response ) ){
+			return wc_add_notice( $this->connection->error_full_message( $response ) , 'error' );
+		}
+
+		$unexpected_error =  $this->connection->plugin_error_obj( '003' , __('Something Went wrong' , 'circlepay' ) );
+		return wc_add_notice( $this->connection->error_full_message( $unexpected_error ) , 'error' );
+	}
+
+	/**
 	 * Order confirmation webhook Callback
 	 *
 	 * @access  public
