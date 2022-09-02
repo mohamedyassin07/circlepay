@@ -118,7 +118,7 @@ class WC_Gateway_CirclePay extends WC_Payment_Gateway {
 	{
 		$this->title = $this->get_option( 'title' );
 		$this->description = $this->get_option( 'description' );
-		$this->icon = CIRCLEPAY_PLUGIN_URL .'/assets/images/circlepay-logo.png';
+		$this->icon = CIRCLEPAY_PLUGIN_URL .'assets/images/circlepay-logo.jpg';
 	}
 
 }

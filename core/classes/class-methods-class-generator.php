@@ -222,9 +222,7 @@ class Methods_Class_Generator{
 		$title 	= $method_data['name'] .' ';
 		$title	.= isset( $method_data['payment_gateway_name'] ) ? $method_data['payment_gateway_name'] : 'CirclePay';
 
-		$icon	= isset( $method_data['payment_method_url'] ) ? $method_data['payment_method_url'] : false;
-		$icon 	= CIRCLEPAY_PLUGIN_URL .'/assets/images/circlepay-light-logo.png';
-		$icon  	= CIRCLEPAY_PLUGIN_URL .'/assets/images/circlepay-logo.jpg';
+		$icon	= isset( $method_data['payment_method_url'] ) && !empty( $method_data['payment_method_url'] ) ? $method_data['payment_method_url'] : CIRCLEPAY_PLUGIN_URL .'assets/images/circlepay-logo.jpg';
 		
 		return array( $name, $id, $title, $icon );
 	}
