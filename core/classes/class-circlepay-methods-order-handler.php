@@ -95,11 +95,23 @@ class CirclePay_Methods_Order_Handler{
 	public function set_order( $order_id )
 	{
 		if( ! $order_id ){
-			$order_id = (int)$_GET['order_token'];
+			$order_id = $this->order_id_from_token( $_GET['order_token'] );
 		}
 
 		$this->order_id = $order_id;
 		$this->order 	= wc_get_order( $this->order_id );
+	}
+
+	/**
+	 * Decrypt the token to get order ID
+	 *
+	 * @access  public
+	 * @since   1.0.0
+	 */
+	protected function order_id_from_token( $token )
+	{
+		require_once CIRCLEPAY_PLUGIN_DIR . 'core/classes/class-token-cryptor.php';
+		return Token_Cryptor::decrypt( $this->order_id );
 	}
 
 	/**
@@ -298,8 +310,21 @@ class CirclePay_Methods_Order_Handler{
 	 */
 	public function return_url()
 	{
-		$token = $this->order_id;
+		$token = $this->genereate_token();
 		return WC()->api_request_url( $this->webhook_slug ) . '?order_token=' . $token ;
+	}
+
+	/**
+	 * Genereate order token
+	 *
+	 * @access  public
+	 * @since   1.0.0
+	 * @return  String
+	 */
+	public function genereate_token()
+	{
+		require_once CIRCLEPAY_PLUGIN_DIR . 'core/classes/class-token-cryptor.php';
+		return Token_Cryptor::encrypt( $this->order_id );
 	}
 
 	/**
