@@ -31,12 +31,13 @@ class WC_Gateway_CirclePay extends WC_Payment_Gateway {
 	 * @var		string
 	 * @since   1.0.0
 	 */
-	public function __construct(){
-
+	public function __construct()
+	{
 		$this->set_generel_settings();
 		$this->init_form_fields();
 		$this->init_settings();
 		$this->set_frontend_settings();
+		$this->saves_the_settings();
 	}
 
 	/**
@@ -50,7 +51,7 @@ class WC_Gateway_CirclePay extends WC_Payment_Gateway {
 		$this->id = CIRCLEPAY_SLUG;
 		$this->has_fields = false ;
 		$this->method_title = __( 'CirclePay', 'circlepay' );
-		$this->method_description = __( 'CirclePay Settings', 'circlepay' );
+		$this->method_description = __( 'CirclePay is a financial service hub for e-commerce helping  merchants to connect with multiple payment gateways through a single plugin.', 'circlepay' );
 		$this->supports = array(
 			'products'
 		);	
@@ -65,33 +66,31 @@ class WC_Gateway_CirclePay extends WC_Payment_Gateway {
 	public function init_form_fields()
 	{
 		$this->form_fields = array(
+			'gateway_settings' => array(
+				'title' => __( 'Gateway Settings', 'circlepay' ),
+				'type' => 'title',
+			),
 			'enabled' => array(
 				'title' => __( 'Enable/Disable', 'circlepay' ),
 				'type' => 'checkbox',
-				'label' => __( 'Enable CirclePay', 'circlepay' ),
+				'label' => __( 'Enable CirclePay Generally', 'circlepay' ),
 				'default' => $this->checkbox_true_val,
 			),
 			'title' => array(
 				'title' => __( 'Title', 'circlepay' ),
 				'type' => 'text',
-				'description' => __( 'This controls the title which will appears in chechout page.', 'circlepay' ),
+				'description' => __( 'ُExtra title will appear on the WooCommerce payment methods page', 'circlepay' ),
 				'default' => __( 'CirclePay', 'circlepay' ),
 			),
-			'description' => array(
-				'title'       => __( 'Description', 'circlepay' ),
-				'type'        => 'textarea',
-				'description' => __( 'This controls the description which the user sees during checkout.', 'circlepay' ),
-				'default'     => __( 'Pay with your credit card via our super-cool payment gateway.', 'circlepay' ),
-			),	
+			'account_info' => array(
+				'title' => __( 'Account Info', 'circlepay' ),
+				'type' => 'title',
+			),
 			'sandbox' => array(
 				'title' => __( 'Enable Sandbox', 'circlepay' ),
 				'type' => 'checkbox',
 				'label' => __( 'Sandbox enables a testing environment to test the whole process before you go production.', 'circlepay' ),
 				'default' => $this->checkbox_true_val,
-			),
-			'account_info' => array(
-				'title' => __( 'Account Info', 'circlepay' ),
-				'type' => 'title',
 			),
 			'account_key' => array(
 				'title' => __( 'Account Key', 'circlepay' ),
@@ -121,4 +120,14 @@ class WC_Gateway_CirclePay extends WC_Payment_Gateway {
 		$this->icon = CIRCLEPAY_PLUGIN_URL .'assets/images/circlepay-logo.jpg';
 	}
 
+	/**
+	 * Save the gateway settings
+	 *
+	 * @var		string
+	 * @since   1.0.0
+	 */
+	public function saves_the_settings()
+	{
+		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
+	}
 }
