@@ -235,18 +235,9 @@ class CirclePay_Methods_Order_Handler{
 
 		$response = $this->connection->create_invoice( $data ) ;
 
-		if( is_array( $response ) && isset( $response['data'] ) && isset( $response['data'][0] ) && isset( $response['data'][0]['invoice_number'] ) ){
+		if( ! $this->connection->is_response_error( $response ) && isset( $response['data'][0]['invoice_number'] ) ){
 			$this->invoice_number = $response['data'][0]['invoice_number'];
 			return update_post_meta( $this->order_id , 'circlepay_invoice_number', $response['data'][0]['invoice_number'] );
-		}
-
-		if( update_post_meta( $this->order_id , 'circlepay_transaction_id', $response['data'][0]['transaction_id'] ) ){
-			$this->invoice_url = $response['data'][0]['invoice_url'];
-			return true;
-		}
-
-		if( is_object( $response ) ){
-			return wc_add_notice( $this->connection->error_full_message( $response ) , 'error' );
 		}
 
 		$error =  $this->connection->plugin_error_obj( '003' , __('Something Went wrong' , 'circlepay' ) );
@@ -268,18 +259,12 @@ class CirclePay_Methods_Order_Handler{
 			'payment_method_id'	=> $this->order->get_payment_method(),
 			'redirect_url' 		=> $this->return_url(),
 		);
-		
+
 		$response = $this->connection->pay_invoice( $data ) ;
 
-		if( is_array( $response ) && isset( $response['data'] ) && isset( $response['data'][0] ) && isset( $response['data'][0]['invoice_url'] ) ){
-			if( update_post_meta( $this->order_id , 'circlepay_transaction_id', $response['data'][0]['transaction_id'] ) ){
-				$this->invoice_url = $response['data'][0]['invoice_url'];
-				return true;
-			}
-		}
-
-		if( is_object( $response ) ){
-			return wc_add_notice( $this->connection->error_full_message( $response ) , 'error' );
+		if( ! $this->connection->is_response_error( $response ) && isset( $response['data'][0]['invoice_url'] ) ){
+			$this->invoice_url = $response['data'][0]['invoice_url'];
+			return update_post_meta( $this->order_id , 'circlepay_transaction_id', $response['data'][0]['transaction_id'] );
 		}
 
 		$error =  $this->connection->plugin_error_obj( '002' , __('Something Went wrong' , 'circlepay' ) );
@@ -380,7 +365,7 @@ class CirclePay_Methods_Order_Handler{
 
 		$response = $this->connection->create_invoice_v2( $data ) ;
 
-		if( is_array( $response ) && isset( $response['data'] ) && isset( $response['data'][0] ) && isset( $response['data'][0]['transaction_id'] ) ){
+		if( ! $this->connection->is_response_error( $response ) && isset( $response['data'][0]['transaction_id'] ) ){
 			$this->transaction_id = $response['data'][0]['transaction_id'];
 			$this->invoice_url = $response['data'][0]['invoice_url'];
 			return true;
@@ -390,7 +375,7 @@ class CirclePay_Methods_Order_Handler{
 			return wc_add_notice( $this->connection->error_full_message( $response ) , 'error' );
 		}
 
-		$unexpected_error =  $this->connection->plugin_error_obj( '003' , __('Something Went wrong' , 'circlepay' ) );
+		$unexpected_error =  $this->connection->plugin_error_obj( '005' , __('Something Went wrong' , 'circlepay' ) );
 		return wc_add_notice( $this->connection->error_full_message( $unexpected_error ) , 'error' );
 	}
 
@@ -421,15 +406,14 @@ class CirclePay_Methods_Order_Handler{
 	 */
 	private function is_paid_circlepay_invoice()
 	{
-		return false;
-		$invoice_num = get_post_meta( $this->order_id ,'circlepay_invoice_number' , true  );
+		$invoice_num 	= get_post_meta( $this->order_id ,'circlepay_invoice_number' , true  );
 		$response 		= $this->connection->get_invoice( $invoice_num );
 
 		if( $this->connection->is_response_error( $response ) ){
 			return false;
 		}
 
-		if( is_array( $response ) && isset( $response['data'] ) && isset( $response['data'][0] ) && isset( $response['data'][0]['status'] ) && $response['data'][0]['status'] === 1 ){
+		if( ! $this->connection->is_response_error( $response ) && isset( $response['data'][0]['status'] ) && $response['data'][0]['status'] === 1 ){
 			return true;
 		}
 

@@ -87,7 +87,6 @@ class CirclePay_API{
 	 */
 	public function create_connection( $endpoint_url, $type, $body = array() )
 	{
-
 		$headers = array(
 			'Content-Type'		=> 'application/json',
 			'Accept'			=> 'application/json',
@@ -134,11 +133,13 @@ class CirclePay_API{
 			||
 			( is_object( $response ) && property_exists( $response, 'error') &&  ! empty( $response->error  ) && $response->status )
 			||
-			( isset( $response['isError'] ) && $response['isError'] )
+			( is_array( $response) && isset( $response['isError'] ) && $response['isError'] )
 			||
 			( is_array( $response) && isset( $response['error'] ) && ! empty( $response['error'] ) && $response['status']  )
 			||
 			( is_array( $response) && isset( $response['errorCode'] ) && $response['errorCode'] !== 0 )
+			||
+			is_array( $response ) && ! isset( $response['body'] ) && ! isset( $response['data'] )
 		){
 			return true;
 		}

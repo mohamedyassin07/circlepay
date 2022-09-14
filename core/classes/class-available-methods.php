@@ -79,27 +79,29 @@ class CirclePay_Available_Methods{
 	{
 		$available_methods = [];
 
-		// add the CirclePay available methods		
+		// add the CirclePay available methods
 		require_once CIRCLEPAY_PLUGIN_DIR . 'core/classes/class-api-connection.php';
 		require_once CIRCLEPAY_PLUGIN_DIR . 'core/classes/class-methods-class-generator.php';
 
 		$connection = new CirclePay_API;
-		$methods 	= $connection->enabled_payment_methods();
+		$response 	= $connection->enabled_payment_methods();
 
-		if( isset( $methods['data']) ){
-			$generator = new Methods_Class_Generator( $methods['data'] );
-			$new_methods = $generator->get_available_methods();
-
-			foreach ( $new_methods as $key => $method) {
-				include_once ( $method['file'] );
-
-				if( class_exists( $method['class_name'] )){
-					$available_methods[ $key ] =  new $method['class_name'];
-				}  
-			
-			}
+		if( $connection->is_response_error( $response ) ){
+			return $available_methods;
 		}
 
+		$generator = new Methods_Class_Generator( $response['data'] );
+		$new_methods = $generator->get_available_methods();
+
+		foreach ( $new_methods as $key => $method) {
+			include_once ( $method['file'] );
+
+			if( class_exists( $method['class_name'] )){
+				$available_methods[ $key ] =  new $method['class_name'];
+			}  
+		
+		}
+		
 		return $available_methods ;
 	}
 
