@@ -76,7 +76,7 @@ class CirclePay_API{
 		$this->account_token 	= sanitize_text_field( $circlepay_data['account_token'] );
 		$this->merchant_token 	= sanitize_text_field( $circlepay_data['merchant_token'] );
 		$this->sandbox 			= sanitize_text_field( $circlepay_data['sandbox'] ) !== 'yes' ? false :  true;
-		$this->api_url 			= $this->sandbox ? 'https://sandbox-openapi.circlepay.ai/' : 'https://sandbox-openapi.circlepay.ai/';
+		$this->api_url 			= $this->sandbox ? 'https://sandbox-openapi.circlepay.ai/' : 'https://openapi.circlepay.ai/';
 	}
 
 	/**
