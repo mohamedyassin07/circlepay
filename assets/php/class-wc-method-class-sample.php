@@ -4,24 +4,24 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 /**
- * Class {{Method_Name_GateWay_Name}}
+ * Class CirclePay_Sample_Method_Class
  *
  * This class will be used to generate new classes
  * for the available methods dynamically so we cover the current dozen of current methods and all the methods will be added in the future
  *
  * @package		CIRCLEPAY
- * @subpackage	Classes/{{Method_Name_GateWay_Name}}
+ * @subpackage	Classes/CirclePay_Sample_Method_Class
  * @author		Payzaty
  * @since		1.0.0
  */
-class {{Method_Name_GateWay_Name}} extends WC_Payment_Gateway {
+class CirclePay_Sample_Method_Class extends WC_Payment_Gateway {
 
 	public function __construct(){
-		$this->id = '{{method_name_gateWay_name_id}}';
-		$this->icon = '{{method_name_gateWay_name_icon}}';
+		$this->id = 'sample_method_id';
+		$this->icon = 'sample_method_icon';
 		$this->has_fields = false ;
-		$this->method_title = '{{method_name_gateWay_name_id}}';
-		$this->title = '{{method_name_gateWay_name_title}}';
+		$this->method_title = 'sample_method_title';
+		$this->title = 'sample_method_title';
 	}
 
 	/**

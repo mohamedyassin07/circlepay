@@ -196,10 +196,10 @@ class Methods_Class_Generator{
 	public function method_file_content( $method_data )
 	{
 		$search = array(
-			'{{Method_Name_GateWay_Name}}',
-			'{{method_name_gateWay_name_id}}',
-			'{{method_name_gateWay_name_title}}',
-			'{{method_name_gateWay_name_icon}}',
+			'CirclePay_Sample_Method_Class',
+			'sample_method_id',
+			'sample_method_title',
+			'sample_method_icon',
 		);
 
 		$replace = $this->replace_date( $method_data );

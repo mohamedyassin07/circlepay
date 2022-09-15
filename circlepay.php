@@ -11,8 +11,8 @@
  * Plugin URI:    https://circlepay.ai
  * Description:   CirclePay provides Businesses with Multiple payment Solutions through single API integration.
  * Version:       1.0.0
- * Author:        Mohamed Yassin
- * Author URI:    https://github.com/mohamedyassin07
+ * Author:        CirclePay
+ * Author URI:    https://circlepay.ai/
  * Text Domain:   circlepay
  * Domain Path:   /languages
  */
