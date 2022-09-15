@@ -95,7 +95,11 @@ class CirclePay_Methods_Order_Handler{
 	public function set_order( $order_id )
 	{
 		if( ! $order_id ){
-			$order_id = $this->order_id_from_token( $_GET['order_token'] );
+			$order_id = (int)$this->order_id_from_token( $_GET['order_token'] );
+		}
+
+		if( ! $order_id || get_post_type( $order_id ) !== 'shop_order' ){
+			wp_die( __( 'You Can\'t access' , 'circlepay') );
 		}
 
 		$this->order_id = $order_id;
@@ -111,7 +115,7 @@ class CirclePay_Methods_Order_Handler{
 	protected function order_id_from_token( $token )
 	{
 		require_once CIRCLEPAY_PLUGIN_DIR . 'core/classes/class-token-cryptor.php';
-		return Token_Cryptor::decrypt( $this->order_id );
+		return Token_Cryptor::decrypt( $token );
 	}
 
 	/**
@@ -219,7 +223,7 @@ class CirclePay_Methods_Order_Handler{
 						'quantity' 	=> 1
 					)
 				),
-				'due_date' => date( 'Y-m-d', strtotime("+1 day") ),
+				'due_date' => date( 'Y-m-d', strtotime('+1 day') ),
 				'discount_type' => 'string',
 				'discount_value' => 0,
 				'discount_value_calculated' => 0,
@@ -296,6 +300,7 @@ class CirclePay_Methods_Order_Handler{
 	public function return_url()
 	{
 		$token = $this->genereate_token();
+		update_post_meta( $this->order_id , 'circlepay_token', $token );
 		return WC()->api_request_url( $this->webhook_slug ) . '?order_token=' . $token ;
 	}
 
@@ -345,7 +350,7 @@ class CirclePay_Methods_Order_Handler{
 					'cust_1' => 'val_1',
 					'cust_2' => 'val_2'
 				),
-				'due_date' 					=> date( 'Y-m-d', strtotime("+1 day") ),
+				'due_date' 					=> date( 'Y-m-d', strtotime('+1 day') ),
 				'discount_value_calculated' => 0,
 				'items' 					=> array(
 					// due to that circlepay need every thing detailed 
@@ -410,10 +415,10 @@ class CirclePay_Methods_Order_Handler{
 		$response 		= $this->connection->get_invoice( $invoice_num );
 
 		if( $this->connection->is_response_error( $response ) ){
-			return false;
+			wp_die(__( 'Not allowed to complete order confirmation process due to an API related error' ,'circlepay') );
 		}
 
-		if( ! $this->connection->is_response_error( $response ) && isset( $response['data'][0]['status'] ) && $response['data'][0]['status'] === 1 ){
+		if( $response['data'][0]['status'] === 2 ){
 			return true;
 		}
 
@@ -443,10 +448,8 @@ class CirclePay_Methods_Order_Handler{
 	 */
 	private function fail_the_order()
 	{
-		$this->order->update_status('failed');	
-		echo __( "Payment did completed correctly" , 'circlepay');
-		header( 'HTTP/1.1 200 OK' );
-		die();
+		$this->order->update_status( 'failed' );
+		wp_die( __( 'Payment didn\'t completed/paid correctly' , 'circlepay') );
 	}
 }
 
