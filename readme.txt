@@ -1,5 +1,5 @@
 ﻿=== CirclePay ===
-Contributors: circlepay
+Contributors: mhmdyassin07, circlepay
 Tags: circlepay, circle pay,payment methods, payment gateways, cross border, payment request, cross border, single integration, single dashboard, added services, woocommerce.
 Requires at least: 5.7
 Tested up to: 6.0
