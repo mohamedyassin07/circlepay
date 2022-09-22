@@ -1,10 +1,10 @@
 ﻿=== CirclePay ===
-Contributors: mhmdyassin07, circlepay
-Tags: circlepay, circle pay,payment methods, payment gateways, cross border, payment request, cross border, single integration, single dashboard, added services, woocommerce.
+Contributors: mhmdyassin07
+Tags: circlepay, circle pay, egypt, fawry, jumiapay, stripe, payment methods, kashier, saudi arabia, ksa, payment gateways, cross border, payment request, cross border, single integration, single dashboard, added services, woocommerce.
 Requires at least: 5.7
 Tested up to: 6.0
 Requires PHP: 7.0
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Attributions: circlepay
