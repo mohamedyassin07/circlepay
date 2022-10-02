@@ -4,13 +4,13 @@
  *
  * @package       CIRCLEPAY
  * @author        Mohamed Yassin
- * @version       1.0.1
+ * @version       1.0.2
  *
  * @wordpress-plugin
  * Plugin Name:   CirclePay
  * Plugin URI:    https://circlepay.ai
  * Description:   CirclePay provides Businesses with Multiple payment Solutions through single API integration.
- * Version:       1.0.1
+ * Version:       1.0.2
  * Author:        CirclePay
  * Author URI:    https://circlepay.ai/
  * Text Domain:   circlepay

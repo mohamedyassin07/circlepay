@@ -118,10 +118,10 @@ class CirclePay_Available_Methods{
 	public function override_checkout_fields( $fields )
 	{
 		if( isset( $fields['billing']['billing_phone'] ) ){
-			$fields['billing']['billing_phone']['label'] 		= __( 'Pone (International Format)', 'circlepay' );
+			$fields['billing']['billing_phone']['label'] 		= __( 'Phone (International Format)', 'circlepay' );
 			$fields['billing']['billing_phone']['placeholder'] 	= __( 'Must be inetrnational format : +20123456789', 'circlepay' );
 		}else{
-			$fields['billing']['billing_phone']['label'] 		= __( 'Pone (International Format)', 'circlepay' );
+			$fields['billing']['billing_phone']['label'] 		= __( 'Phone (International Format)', 'circlepay' );
 			$fields['billing']['billing_phone']['placeholder'] 	= __( 'Must be inetrnational format : +20123456789', 'circlepay' );
 			$fields['billing']['billing_phone']['required'] 	= true;
 			$fields['billing']['billing_phone']['required'] 	= true;

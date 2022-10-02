@@ -4,7 +4,7 @@ Tags: circlepay, circle pay, egypt, fawry, jumiapay, stripe, payment methods, ka
 Requires at least: 5.7
 Tested up to: 6.0
 Requires PHP: 7.0
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Attributions: circlepay
@@ -110,5 +110,12 @@ If you get stuck, you can ask for help in the Plugin Forum.
 
 = 1.0.0: November 15, 2022 =
 * Birthday of CirclePay WooCommerce Plugin
+
+= 1.0.2: November 25, 2022 =
+* Fix a minor bug
+
+= 1.0.2: October 02, 2022 =
+* Fix a minor bug when clicking the 'Place Order' button
+* Spelling error fix
 
 [See changelog for all versions](https://raw.githubusercontent.com/woocommerce/circlepay/trunk/changelog.txt).
