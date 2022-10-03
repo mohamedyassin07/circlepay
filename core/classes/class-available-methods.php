@@ -72,24 +72,29 @@ class CirclePay_Available_Methods{
 	 * Get CirclePay available methods 
 	 *
 	 * @access  public
-	 * @since   1.0.0
+	 * @since   1.0.2
 	 * @return  Array
 	 */
 	public function circlepay_available_methods()
 	{
-		$available_methods = [];
+		global $circlepay_available_methods;
+
+		if( !empty ( $circlepay_available_methods  ) ){
+			return $circlepay_available_methods;
+		}
+
+		$circlepay_available_methods = [];
 
 		// add the CirclePay available methods
 		require_once CIRCLEPAY_PLUGIN_DIR . 'core/classes/class-api-connection.php';
-		require_once CIRCLEPAY_PLUGIN_DIR . 'core/classes/class-methods-class-generator.php';
-
 		$connection = new CirclePay_API;
 		$response 	= $connection->enabled_payment_methods();
 
 		if( $connection->is_response_error( $response ) ){
-			return $available_methods;
+			return $circlepay_available_methods;
 		}
 
+		require_once CIRCLEPAY_PLUGIN_DIR . 'core/classes/class-methods-class-generator.php';
 		$generator = new Methods_Class_Generator( $response['data'] );
 		$new_methods = $generator->get_available_methods();
 
@@ -97,12 +102,12 @@ class CirclePay_Available_Methods{
 			include_once ( $method['file'] );
 
 			if( class_exists( $method['class_name'] )){
-				$available_methods[ $key ] =  new $method['class_name'];
+				$circlepay_available_methods[ $key ] =  new $method['class_name'];
 			}  
 		
 		}
-		
-		return $available_methods ;
+
+		return $circlepay_available_methods ;
 	}
 
 	/**
@@ -112,7 +117,7 @@ class CirclePay_Available_Methods{
 	 * about the required phone format
 	 *
 	 * @access  public
-	 * @since   1.0.0
+	 * @since   1.0.2
 	 * @return  Array
 	 */
 	public function override_checkout_fields( $fields )

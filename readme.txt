@@ -111,11 +111,9 @@ If you get stuck, you can ask for help in the Plugin Forum.
 = 1.0.0: November 15, 2022 =
 * Birthday of CirclePay WooCommerce Plugin
 
-= 1.0.2: November 25, 2022 =
+= 1.0.1: November 25, 2022 =
 * Fix a minor bug
 
 = 1.0.2: October 02, 2022 =
-* Fix a minor bug when clicking the 'Place Order' button
+* Improve methods classes creation process
 * Spelling error fix
-
-[See changelog for all versions](https://raw.githubusercontent.com/woocommerce/circlepay/trunk/changelog.txt).

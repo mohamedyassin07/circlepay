@@ -197,12 +197,12 @@ class CirclePay_API{
 	/**
 	 * Full error Message
 	 * @access	public
-	 * @since	1.0.0
+	 * @since	1.0.2
 	 * @return	String
 	 */
 	public function error_full_message( $error )
 	{
-		return "({$error->errorCode}) {$error->message} : $error->details";
+		return "({$error->errorCode}) {$error->message} : {$error->details}";
 	}
 
 	/*

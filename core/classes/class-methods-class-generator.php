@@ -36,7 +36,9 @@ class Methods_Class_Generator{
 		$this->set_defaults();
 
 		if( ! is_dir( $this->methods_dir )  ){
-			$this->create_methods_dir( $this->methods_dir );
+			$this->create_methods_dir();
+		}else {
+			$this->clear_dir();
 		}
 
 		foreach ( $methods as $method ) {
@@ -62,7 +64,7 @@ class Methods_Class_Generator{
 	 * Create generated methods directory 
 	 *
 	 * @access  public
-	 * @since   1.0.0
+	 * @since   1.0.2
 	 */
 	public function create_methods_dir()
 	{
@@ -96,6 +98,24 @@ class Methods_Class_Generator{
 		}
 	}
 
+
+	/**
+	 * Clear the directory
+	 * to avoid any reflections between files 
+	 *
+	 * @access  public
+	 * @since   1.0.2
+	 */
+	public function clear_dir()
+	{
+		$files = glob( $this->methods_dir . '*.php' );
+		foreach($files as $file){
+			if(is_file($file)) {
+				unlink($file);
+			}
+		}
+	}
+	
 	/**
 	 * Create a file
 	 *
@@ -122,7 +142,6 @@ class Methods_Class_Generator{
 		$method_file = $this->method_file_path( $method_data );
 		if( is_file( $method_file )  ){
 			$this->add_method_to_the_available ( $method_data , $method_file );
-			//return;
 		}
 
 		$this->generate_class_file( $method_file, $method_data );
@@ -164,13 +183,13 @@ class Methods_Class_Generator{
 	 * Get the Method file name
 	 *
 	 * @access  public
-	 * @since   1.0.0
+	 * @since   1.0.2
 	 * @return  String
 	 */
 	public function method_file_name( $method_data )
 	{
 		$method = str_replace( ' ', '-' ,  strtolower( trim( $method_data['name'] ) ) ) ;
-		$gateway = isset( $method_data['gateway'] ) ? str_replace( ' ', '-' ,  strtolower( trim( $method_data['gateway'] ) ) ) : 'circlepay' ;
+		$gateway = isset( $method_data['payment_gateway_name'] ) ? str_replace( ' ', '-' ,  strtolower( trim( $method_data['payment_gateway_name'] ) ) ) : 'circlepay' ;
 		return 'class-' . $method . '-' . $gateway . '.php';
 	}
 	
